@@ -1,0 +1,39 @@
+# === Node / Frontend / Backend ===
+frontend/node_modules/
+frontend/dist/
+frontend/dist-ssr/
+frontend/.env
+frontend/*.local
+
+backend/node_modules/
+backend/.env
+
+# === Logs ===
+logs/
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+
+# === VSCode & IDEs ===
+.vscode/
+!.vscode/extensions.json
+.idea/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+
+# === System / Editor ===
+.DS_Store
+*.swp
+
+# === Test & Coverage ===
+coverage/
+
+# === React Build ===
+frontend/build/
+frontend/.vite/
