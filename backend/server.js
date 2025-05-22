@@ -1,30 +1,40 @@
+// 1. Core imports
 import express from 'express';
 import cors from 'cors';
 import dotenv from 'dotenv';
 
+// 2. Custom modules
+import db from './config/db.js';
+import authRoutes from './routes/authRoutes.js';
+
+// 3. Load .env
 dotenv.config();
 
+// 4. Express setup
 const app = express();
 const PORT = process.env.PORT || 3000;
 
+// 5. Middleware
 app.use(cors());
 app.use(express.json());
 
+// 6. Routes
+app.use('/auth', authRoutes);
 app.get('/', (req, res) => {
   res.send('API is running');
 });
 
-app.listen(PORT, () => {
-  console.log(`Server running on http://localhost:${PORT}`);
-});
-
-import db from './config/db.js';
-
+// 7. DB connection test (optional: nur für dev/debug)
 db.getConnection()
   .then(conn => {
-    console.log(' Connected to MariaDB');
+    console.log('Connected to MariaDB');
     conn.end();
   })
   .catch(err => {
-    console.error(' DB connection failed:', err);
+    console.error('DB connection failed:', err);
   });
+
+// 8. Server listen
+app.listen(PORT, () => {
+  console.log(`Server running on http://localhost:${PORT}`);
+});
