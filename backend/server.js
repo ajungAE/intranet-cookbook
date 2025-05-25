@@ -6,6 +6,7 @@ import dotenv from 'dotenv';
 // 2. Custom modules
 import db from './config/db.js';
 import authRoutes from './routes/authRoutes.js';
+import recipeRoutes from './routes/recipeRoutes.js';
 
 // 3. Load .env
 dotenv.config();
@@ -20,6 +21,7 @@ app.use(express.json());
 
 // 6. Routes
 app.use('/auth', authRoutes);
+app.use('/recipes', recipeRoutes);
 app.get('/', (req, res) => {
   res.send('API is running');
 });
