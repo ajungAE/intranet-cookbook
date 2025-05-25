@@ -1,6 +1,6 @@
 import db from '../config/db.js';
 
-// POST 
+// POST /recipes
 export const createRecipe = async (req, res) => {
   const imagePath = req.file ? req.file.path : null;
   const { title, ingredients, instructions } = req.body;
@@ -27,3 +27,20 @@ export const createRecipe = async (req, res) => {
     res.status(500).json({ message: 'Failed to create recipe', error: err.message });
   }
 };
+
+// GET /recipes
+export const getAllRecipes = async (req, res) => {
+  try {
+    const conn = await db.getConnection();
+    const recipes = await conn.query(
+      'SELECT id, title, ingredients, instructions, image_path, created_at FROM recipe ORDER BY created_at DESC'
+    );
+    conn.end();
+
+    res.status(200).json(recipes);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: 'Failed to fetch recipes', error: err.message });
+  }
+};
+
