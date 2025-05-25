@@ -2,6 +2,7 @@ import db from '../config/db.js';
 
 // POST 
 export const createRecipe = async (req, res) => {
+  const imagePath = req.file ? req.file.path : null;
   const { title, ingredients, instructions } = req.body;
 
   if (!title || !ingredients || !instructions) {
@@ -11,8 +12,8 @@ export const createRecipe = async (req, res) => {
   try {
     const conn = await db.getConnection();
     const result = await conn.query(
-      'INSERT INTO recipe (title, ingredients, instructions, user_id) VALUES (?, ?, ?, ?)',
-      [title, ingredients, instructions, req.user.id]
+      'INSERT INTO recipe (title, ingredients, instructions, user_id, image_path) VALUES (?, ?, ?, ?, ?)',
+      [title, ingredients, instructions, req.user.id, imagePath]
     );
     conn.end();
 
