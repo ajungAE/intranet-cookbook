@@ -44,3 +44,26 @@ export const getAllRecipes = async (req, res) => {
   }
 };
 
+// GET /recipes/:id
+export const getRecipeById = async (req, res) => {
+  const recipeId = req.params.id;
+
+  try {
+    const conn = await db.getConnection();
+    const result = await conn.query(
+      'SELECT id, title, ingredients, instructions, image_path, created_at FROM recipe WHERE id = ?',
+      [recipeId]
+    );
+    conn.end();
+
+    if (result.length === 0) {
+      return res.status(404).json({ message: 'Recipe not found' });
+    }
+
+    res.status(200).json(result[0]);
+
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: 'Failed to fetch recipe', error: err.message });
+  }
+};
