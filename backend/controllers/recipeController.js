@@ -67,3 +67,38 @@ export const getRecipeById = async (req, res) => {
     res.status(500).json({ message: 'Failed to fetch recipe', error: err.message });
   }
 };
+
+// DELETE /recipes/:id
+export const deleteRecipe = async (req, res) => {
+  const recipeId = req.params.id;
+  const userId = req.user.id;
+
+  try {
+    const conn = await db.getConnection();
+    const result = await conn.query(
+      'SELECT user_id FROM recipe WHERE id = ?',
+      [recipeId]
+    );
+
+    if (result.length === 0) {
+      conn.end();
+      return res.status(404).json({ message: 'Recipe not found' });
+    }
+
+    const recipe = result[0];
+
+    if (recipe.user_id !== userId) {
+      conn.end();
+      return res.status(403).json({ message: 'Not authorized to delete this recipe' });
+    }
+
+    await conn.query('DELETE FROM recipe WHERE id = ?', [recipeId]);
+    conn.end();
+
+    res.status(200).json({ message: 'Recipe deleted successfully' });
+
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: 'Failed to delete recipe', error: err.message });
+  }
+};
