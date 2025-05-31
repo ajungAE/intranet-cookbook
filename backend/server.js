@@ -25,13 +25,11 @@ app.use(express.json());
 
 // 6. Routes
 app.use('/auth', authRoutes);
+app.use('/uploads', express.static('uploads'));
 app.use('/recipes', recipeRoutes);
 app.use('/categories', categoryRoutes);
 app.use('/favorites', favoriteRoutes);
 app.use('/comments', commentRoutes);
-app.get('/', (req, res) => {
-  res.send('API is running');
-});
 
 // 7. DB connection test (optional: nur für dev/debug)
 db.getConnection()
