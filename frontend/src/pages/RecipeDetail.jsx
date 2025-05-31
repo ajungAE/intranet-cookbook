@@ -10,6 +10,13 @@ const RecipeDetail = () => {
   const [comments, setComments] = useState([]);
   const [error, setError] = useState("");
 
+  const [newComment, setNewComment] = useState("");
+  const [submitError, setSubmitError] = useState("");
+  const [submitSuccess, setSubmitSuccess] = useState("");
+
+  // 🧪 Token aus localStorage holen (wenn vorhanden)
+  const token = localStorage.getItem("token");
+
   // ================================
   // REZEPT LADEN beim ersten Render
   // ================================
@@ -56,6 +63,41 @@ const RecipeDetail = () => {
     return <div className="container mt-5">Lade Rezept...</div>;
   }
 
+  // Kommentar absenden
+  const handleCommentSubmit = async (e) => {
+    e.preventDefault();
+    setSubmitError("");
+    setSubmitSuccess("");
+
+    if (!newComment.trim()) {
+      return setSubmitError("Kommentar darf nicht leer sein.");
+    }
+
+    try {
+      const res = await fetch(`http://ajubuntu:3000/comments/${id}`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({ text: newComment }),
+      });
+
+      const data = await res.json();
+
+      if (!res.ok) {
+        throw new Error(data.message || "Fehler beim Speichern");
+      }
+
+      // Kommentar erfolgreich → leeren + neu laden
+      setNewComment("");
+      setSubmitSuccess("Kommentar wurde gespeichert.");
+      setComments((prev) => [...prev, data]); // Optional sofort anzeigen
+    } catch (err) {
+      setSubmitError(err.message);
+    }
+  };
+
   // ===============================
   // Hauptinhalt der Detailseite
   // ===============================
@@ -96,6 +138,39 @@ const RecipeDetail = () => {
           </li>
         ))}
       </ul>
+
+      {/* Kommentar schreiben */}
+      {token ? (
+        <form onSubmit={handleCommentSubmit} className="mb-4">
+          <div className="mb-3">
+            <label htmlFor="comment" className="form-label">
+              Kommentar schreiben
+            </label>
+            <textarea
+              id="comment"
+              className="form-control"
+              rows="3"
+              value={newComment}
+              onChange={(e) => setNewComment(e.target.value)}
+            ></textarea>
+          </div>
+          {submitError && (
+            <div className="alert alert-danger">{submitError}</div>
+          )}
+          {submitSuccess && (
+            <div className="alert alert-success">{submitSuccess}</div>
+          )}
+          <button type="submit" className="btn btn-primary">
+            Absenden
+          </button>
+        </form>
+      ) : (
+        <p>
+          <em>
+            Bitte <strong>einloggen</strong>, um einen Kommentar zu schreiben.
+          </em>
+        </p>
+      )}
     </div>
   );
 };
