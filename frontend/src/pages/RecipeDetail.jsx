@@ -100,26 +100,43 @@ const RecipeDetail = () => {
 
   // Rezept als Favorit markieren
   const handleFavorite = async () => {
-  if (!token) return;
+    if (!token) return;
 
-  try {
-    const res = await fetch(`http://ajubuntu:3000/favorites/${recipe.id}`, {
-      method: "POST",
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    });
+    try {
+      const res = await fetch(`http://ajubuntu:3000/favorites/${recipe.id}`, {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
 
-    const data = await res.json();
-    if (!res.ok) throw new Error(data.message || "Fehler beim Hinzufügen");
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.message || "Fehler beim Hinzufügen");
 
-    setIsFavorite(true);
-  } catch (err) {
-    console.error("Fehler beim Speichern des Favoriten:", err.message);
-  }
-};
+      setIsFavorite(true);
+    } catch (err) {
+      console.error("Fehler beim Speichern des Favoriten:", err.message);
+    }
+  };
 
-   
+  // Rezept aus Favoriten entfernen
+  const handleUnfavorite = async () => {
+    try {
+      const res = await fetch(`http://ajubuntu:3000/favorites/${recipe.id}`, {
+        method: "DELETE",
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.message || "Fehler beim Entfernen");
+
+      setIsFavorite(false); // UI zurücksetzen
+    } catch (err) {
+      console.error("Fehler beim Entfernen des Favoriten:", err.message);
+    }
+  };
 
   // ===============================
   // Hauptinhalt der Detailseite
@@ -146,16 +163,15 @@ const RecipeDetail = () => {
       <h5>Zubereitung:</h5>
       <p>{recipe.instructions}</p>
 
-      {/* Als Favorit markieren */}
+      {/* Als Favorit markieren oder entfernen */}
       {token && (
         <button
-          onClick={handleFavorite}
+          onClick={isFavorite ? handleUnfavorite : handleFavorite}
           className={`btn ${
-            isFavorite ? "btn-success" : "btn-outline-success"
+            isFavorite ? "btn-danger" : "btn-outline-success"
           } mb-4`}
-          disabled={isFavorite}
         >
-          {isFavorite ? "Als Favorit gespeichert" : "Zu Favoriten hinzufügen"}
+          {isFavorite ? "Aus Favoriten entfernen" : "Zu Favoriten hinzufügen"}
         </button>
       )}
 
