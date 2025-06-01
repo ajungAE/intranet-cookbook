@@ -9,10 +9,10 @@ const RecipeDetail = () => {
   const [recipe, setRecipe] = useState(null);
   const [comments, setComments] = useState([]);
   const [error, setError] = useState("");
-
   const [newComment, setNewComment] = useState("");
   const [submitError, setSubmitError] = useState("");
   const [submitSuccess, setSubmitSuccess] = useState("");
+  const [isFavorite, setIsFavorite] = useState(false);
 
   // 🧪 Token aus localStorage holen (wenn vorhanden)
   const token = localStorage.getItem("token");
@@ -98,6 +98,29 @@ const RecipeDetail = () => {
     }
   };
 
+  // Rezept als Favorit markieren
+  const handleFavorite = async () => {
+  if (!token) return;
+
+  try {
+    const res = await fetch(`http://ajubuntu:3000/favorites/${recipe.id}`, {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.message || "Fehler beim Hinzufügen");
+
+    setIsFavorite(true);
+  } catch (err) {
+    console.error("Fehler beim Speichern des Favoriten:", err.message);
+  }
+};
+
+   
+
   // ===============================
   // Hauptinhalt der Detailseite
   // ===============================
@@ -122,6 +145,19 @@ const RecipeDetail = () => {
       {/* Zubereitung */}
       <h5>Zubereitung:</h5>
       <p>{recipe.instructions}</p>
+
+      {/* Als Favorit markieren */}
+      {token && (
+        <button
+          onClick={handleFavorite}
+          className={`btn ${
+            isFavorite ? "btn-success" : "btn-outline-success"
+          } mb-4`}
+          disabled={isFavorite}
+        >
+          {isFavorite ? "Als Favorit gespeichert" : "Zu Favoriten hinzufügen"}
+        </button>
+      )}
 
       {/* Kommentarliste */}
       <h5 className="mt-4">Kommentare</h5>
