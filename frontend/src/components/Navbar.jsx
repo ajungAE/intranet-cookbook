@@ -23,6 +23,9 @@ const Navbar = () => {
                 <Link className="nav-link" to="/me">Meine Rezepte</Link>
               </li>
               <li className="nav-item">
+                <Link className="nav-link" to="/create">Rezept erstellen</Link>
+              </li>
+              <li className="nav-item">
                 <Link className="nav-link" to="/favorites">Favoriten</Link>
               </li>
             </>
