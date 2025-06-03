@@ -2,37 +2,55 @@ import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 
 const EditRecipe = () => {
-  const { id } = useParams();
+  const { id } = useParams(); // Holt die ID aus der URL (/edit/:id)
+  const navigate = useNavigate(); // Ermöglicht Weiterleitung nach dem Speichern
+
+  // Lokale Zustände für Rezeptdaten
   const [title, setTitle] = useState("");
   const [ingredients, setIngredients] = useState("");
   const [instructions, setInstructions] = useState("");
   const [image, setImage] = useState(null);
+
+  // Zustände für Feedback und Fehlerbehandlung
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
-  const navigate = useNavigate();
 
-  const token = localStorage.getItem("token");
+  // Kategorien und ausgewählte Kategorie-IDs
+  const [categories, setCategories] = useState([]);
+  const [selectedCategories, setSelectedCategories] = useState([]);
 
-  // Rezeptdaten laden
+  const token = localStorage.getItem("token"); // JWT-Token für Authentifizierung
+
+  // Lädt Rezeptdaten + Kategorien beim ersten Render
   useEffect(() => {
-    const fetchRecipe = async () => {
+    const fetchData = async () => {
       try {
+        // Holt das aktuelle Rezept
         const res = await fetch(`http://ajubuntu:3000/recipes/${id}`);
         const data = await res.json();
-
         if (!res.ok) throw new Error(data.message || "Fehler beim Laden");
+
+        // Setzt die Felder für Titel, Zutaten usw.
         setTitle(data.title);
         setIngredients(data.ingredients);
         setInstructions(data.instructions);
+
+        // Wandelt Kategorieobjekte in ID-Array um
+        setSelectedCategories(data.categories.map((cat) => cat.id));
+
+        // Holt alle verfügbaren Kategorien
+        const catRes = await fetch("http://ajubuntu:3000/categories");
+        const cats = await catRes.json();
+        setCategories(cats);
       } catch (err) {
         setError(err.message);
       }
     };
 
-    fetchRecipe();
+    fetchData();
   }, [id]);
 
-  // Rezept aktualisieren
+  // Speichert die Änderungen
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError("");
@@ -46,6 +64,8 @@ const EditRecipe = () => {
     formData.append("title", title);
     formData.append("ingredients", ingredients);
     formData.append("instructions", instructions);
+    formData.append("categoryIds", JSON.stringify(selectedCategories)); // wichtig!
+
     if (image) {
       formData.append("image", image);
     }
@@ -72,10 +92,12 @@ const EditRecipe = () => {
   return (
     <div className="container mt-5">
       <h2>Rezept bearbeiten</h2>
+
       {error && <div className="alert alert-danger">{error}</div>}
       {success && <div className="alert alert-success">{success}</div>}
 
       <form onSubmit={handleSubmit} encType="multipart/form-data">
+        {/* Titel */}
         <div className="mb-3">
           <label className="form-label">Titel</label>
           <input
@@ -87,6 +109,7 @@ const EditRecipe = () => {
           />
         </div>
 
+        {/* Zutaten */}
         <div className="mb-3">
           <label className="form-label">Zutaten</label>
           <textarea
@@ -98,6 +121,7 @@ const EditRecipe = () => {
           ></textarea>
         </div>
 
+        {/* Zubereitung */}
         <div className="mb-3">
           <label className="form-label">Zubereitung</label>
           <textarea
@@ -109,6 +133,7 @@ const EditRecipe = () => {
           ></textarea>
         </div>
 
+        {/* Bild aktualisieren */}
         <div className="mb-3">
           <label className="form-label">Neues Bild (optional)</label>
           <input
@@ -117,6 +142,27 @@ const EditRecipe = () => {
             accept="image/*"
             onChange={(e) => setImage(e.target.files[0])}
           />
+        </div>
+
+        {/* Kategorienauswahl */}
+        <div className="mb-3">
+          <label className="form-label">Kategorien</label>
+          <select
+            multiple
+            className="form-select"
+            value={selectedCategories}
+            onChange={(e) =>
+              setSelectedCategories(
+                Array.from(e.target.selectedOptions, (opt) => Number(opt.value))
+              )
+            }
+          >
+            {categories.map((cat) => (
+              <option key={cat.id} value={cat.id}>
+                {cat.name}
+              </option>
+            ))}
+          </select>
         </div>
 
         <button type="submit" className="btn btn-primary">

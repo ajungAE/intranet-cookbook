@@ -158,31 +158,22 @@ export const updateRecipe = async (req, res) => {
   const recipeId = req.params.id;
   const userId = req.user.id;
   const { title, ingredients, instructions } = req.body;
+  const categoryIds = JSON.parse(req.body.categoryIds || '[]');
   const imagePath = req.file ? req.file.path : null;
 
   try {
     const conn = await db.getConnection();
 
-    // Existenz- und Besitzprüfung
-    const result = await conn.query("SELECT * FROM recipe WHERE id = ?", [
-      recipeId,
-    ]);
-
-    if (result.length === 0) {
+    // Rezept abfragen + Rechte prüfen
+    const [result] = await conn.query("SELECT * FROM recipe WHERE id = ?", [recipeId]);
+    if (!result || result.user_id !== userId) {
       conn.end();
-      return res.status(404).json({ message: "Recipe not found" });
+      return res.status(result ? 403 : 404).json({
+        message: result ? "Nicht berechtigt" : "Rezept nicht gefunden"
+      });
     }
 
-    const recipe = result[0];
-
-    if (recipe.user_id !== userId) {
-      conn.end();
-      return res
-        .status(403)
-        .json({ message: "Not authorized to update this recipe" });
-    }
-
-    // SQL-Update vorbereiten
+    // Dynamisches Update-Statement für Felder
     const updateFields = [];
     const values = [];
 
@@ -190,36 +181,41 @@ export const updateRecipe = async (req, res) => {
       updateFields.push("title = ?");
       values.push(title);
     }
-
     if (ingredients) {
       updateFields.push("ingredients = ?");
       values.push(ingredients);
     }
-
     if (instructions) {
       updateFields.push("instructions = ?");
       values.push(instructions);
     }
-
     if (imagePath) {
       updateFields.push("image_path = ?");
       values.push(imagePath);
     }
 
-    values.push(recipeId);
+    if (updateFields.length > 0) {
+      values.push(recipeId);
+      await conn.query(
+        `UPDATE recipe SET ${updateFields.join(", ")} WHERE id = ?`,
+        values
+      );
+    }
 
-    await conn.query(
-      `UPDATE recipe SET ${updateFields.join(", ")} WHERE id = ?`,
-      values
-    );
+    // Kategorien aktualisieren
+    await conn.query("DELETE FROM recipe_category WHERE recipe_id = ?", [recipeId]);
+    for (const catId of categoryIds) {
+      await conn.query(
+        "INSERT INTO recipe_category (recipe_id, category_id) VALUES (?, ?)",
+        [recipeId, catId]
+      );
+    }
 
     conn.end();
-
-    res.status(200).json({ message: "Recipe updated successfully" });
+    res.status(200).json({ message: "Rezept erfolgreich aktualisiert" });
   } catch (err) {
-    console.error(err);
-    res
-      .status(500)
-      .json({ message: "Failed to update recipe", error: err.message });
+    console.error("Fehler beim Aktualisieren:", err);
+    res.status(500).json({ message: "Fehler beim Aktualisieren", error: err.message });
   }
 };
+
