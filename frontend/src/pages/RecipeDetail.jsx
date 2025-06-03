@@ -163,6 +163,25 @@ const RecipeDetail = () => {
       <h5>Zubereitung:</h5>
       <p>{recipe.instructions}</p>
 
+      {/* Kategorie */}
+      <h5>Kategorien:</h5>
+      {recipe.categories && recipe.categories.length > 0 ? (
+        <ul className="list-inline">
+          {recipe.categories.map((cat, index) => (
+            <li
+              key={index}
+              className="list-inline-item badge bg-secondary me-2"
+            >
+              {cat}
+            </li>
+          ))}
+        </ul>
+      ) : (
+        <p>
+          <em>Keine Kategorie zugewiesen</em>
+        </p>
+      )}
+
       {/* Als Favorit markieren oder entfernen */}
       {token && (
         <button
