@@ -1,17 +1,46 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 
 const CreateRecipe = () => {
+  // Lokale Zustände für Formularfelder
   const [title, setTitle] = useState("");
   const [ingredients, setIngredients] = useState("");
   const [instructions, setInstructions] = useState("");
   const [image, setImage] = useState(null);
+
+  // Rückmeldung bei Erfolg oder Fehler
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
+
+  // React Router: Programmatische Navigation (Redirects) z.B. nach dem Speichern
   const navigate = useNavigate();
 
+  // Kategorien vom Server laden
+  const [categories, setCategories] = useState([]);
+
+  // Vom User ausgewählte Kategorien
+  const [selectedCategories, setSelectedCategories] = useState([]);
+
+  // JWT aus dem lokalen Speicher lesen (für geschützte API-Aufrufe)
   const token = localStorage.getItem("token");
 
+  // Lade Kategorien aus dem Backend bei Erstaufruf
+  useEffect(() => {
+    const fetchCategories = async () => {
+      try {
+        const res = await fetch("http://ajubuntu:3000/categories");
+        const data = await res.json();
+        setCategories(data);
+      } catch (err) {
+        console.error("Fehler beim Laden der Kategorien", err);
+      }
+    };
+
+    fetchCategories(); // Nur wenn der Server erfolgreich antwortet, Kategorien setzen
+
+  }, []);
+
+  // Formular absenden (mit Bild und Kategorien)
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError("");
@@ -25,6 +54,8 @@ const CreateRecipe = () => {
     formData.append("title", title);
     formData.append("ingredients", ingredients);
     formData.append("instructions", instructions);
+    formData.append("categoryIds", JSON.stringify(selectedCategories)); // Ausgewählte Kategorien als JSON im FormData mitsenden
+
     if (image) {
       formData.append("image", image);
     }
@@ -41,13 +72,14 @@ const CreateRecipe = () => {
       const data = await res.json();
       if (!res.ok) throw new Error(data.message || "Fehler beim Erstellen");
 
+      // Erfolgsnachricht und Formularfelder zurücksetzen
       setSuccess("Rezept erfolgreich erstellt!");
       setTitle("");
       setIngredients("");
       setInstructions("");
       setImage(null);
 
-      // Optional: Weiterleitung nach kurzer Verzögerung
+      // Weiterleitung nach "Meine Rezepte"
       setTimeout(() => navigate("/me"), 1000);
     } catch (err) {
       setError(err.message);
@@ -103,6 +135,30 @@ const CreateRecipe = () => {
             accept="image/*"
             onChange={(e) => setImage(e.target.files[0])}
           />
+        </div>
+
+        {/* Mehrfachauswahl für Kategorien */}
+        <div className="mb-3">
+          <label htmlFor="categories" className="form-label">
+            Kategorien
+          </label>
+          <select
+            multiple
+            className="form-select"
+            id="categories"
+            value={selectedCategories}
+            onChange={(e) =>
+              setSelectedCategories(
+                Array.from(e.target.selectedOptions, (opt) => Number(opt.value))
+              )
+            }
+          >
+            {categories.map((cat) => (
+              <option key={cat.id} value={cat.id}>
+                {cat.name}
+              </option>
+            ))}
+          </select>
         </div>
 
         <button type="submit" className="btn btn-primary">
