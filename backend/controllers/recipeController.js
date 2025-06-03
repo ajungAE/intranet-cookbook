@@ -33,19 +33,32 @@ export const createRecipe = async (req, res) => {
 export const getAllRecipes = async (req, res) => {
   try {
     const conn = await db.getConnection();
+
     const recipes = await conn.query(
-      "SELECT id, title, ingredients, instructions, image_path, created_at FROM recipe ORDER BY created_at DESC"
+      `SELECT r.*, 
+              GROUP_CONCAT(c.name) AS categories
+       FROM recipe r
+       LEFT JOIN recipe_category rc ON r.id = rc.recipe_id
+       LEFT JOIN category c ON rc.category_id = c.id
+       GROUP BY r.id
+       ORDER BY r.created_at DESC`
     );
+
     conn.end();
 
-    res.status(200).json(recipes);
+    // Optional: Kategorien in Array umwandeln
+    const formatted = recipes.map(r => ({
+      ...r,
+      categories: r.categories ? r.categories.split(',') : []
+    }));
+
+    res.status(200).json(formatted);
   } catch (err) {
     console.error(err);
-    res
-      .status(500)
-      .json({ message: "Failed to fetch recipes", error: err.message });
+    res.status(500).json({ message: 'Failed to fetch recipes', error: err.message });
   }
 };
+
 
 // GET /recipes/me
 export const getMyRecipes = async (req, res) => {
@@ -70,24 +83,38 @@ export const getRecipeById = async (req, res) => {
 
   try {
     const conn = await db.getConnection();
-    const result = await conn.query(
-      "SELECT id, title, ingredients, instructions, image_path, created_at FROM recipe WHERE id = ?",
-      [recipeId]
-    );
-    conn.end();
 
-    if (result.length === 0) {
-      return res.status(404).json({ message: "Recipe not found" });
+    const recipeResult = await conn.query(
+      `SELECT * FROM recipe WHERE id = ?`, [recipeId]
+    );
+
+    if (recipeResult.length === 0) {
+      conn.end();
+      return res.status(404).json({ message: 'Recipe not found' });
     }
 
-    res.status(200).json(result[0]);
+    const catResult = await conn.query(
+      `SELECT c.name 
+       FROM category c 
+       JOIN recipe_category rc ON c.id = rc.category_id
+       WHERE rc.recipe_id = ?`, [recipeId]
+    );
+
+    conn.end();
+
+    const recipe = {
+      ...recipeResult[0],
+      categories: catResult.map(c => c.name)
+    };
+
+    res.status(200).json(recipe);
   } catch (err) {
     console.error(err);
-    res
-      .status(500)
-      .json({ message: "Failed to fetch recipe", error: err.message });
+    res.status(500).json({ message: 'Failed to fetch recipe', error: err.message });
   }
 };
+
+
 
 // DELETE /recipes/:id
 export const deleteRecipe = async (req, res) => {
