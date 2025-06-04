@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { API } from "../config";
 
 const Register = () => {
   // Formularzustände für die Eingabefelder
@@ -24,7 +25,7 @@ const Register = () => {
     }
 
     try {
-      const res = await fetch("http://ajubuntu:3000/auth/register", {
+      const res = await fetch(`${API.AUTH}/register`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email, password, username }),

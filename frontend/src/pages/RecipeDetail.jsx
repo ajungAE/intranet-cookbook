@@ -1,6 +1,8 @@
 import { useParams } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { jwtDecode } from "jwt-decode";
+import { API } from "../config";
+
 
 const RecipeDetail = () => {
   // ID aus der URL extrahieren (/recipes/:id)
@@ -29,7 +31,7 @@ const RecipeDetail = () => {
   useEffect(() => {
     const fetchRecipe = async () => {
       try {
-        const res = await fetch(`http://ajubuntu:3000/recipes/${id}`);
+        const res = await fetch(`${API.RECIPES}/${id}`);
         const data = await res.json();
 
         if (!res.ok) throw new Error(data.message || "Fehler beim Laden");
@@ -48,7 +50,7 @@ const RecipeDetail = () => {
   useEffect(() => {
     const fetchComments = async () => {
       try {
-        const res = await fetch(`http://ajubuntu:3000/comments/${id}`);
+        const res = await fetch(`${API.COMMENTS}/${id}`);
         const data = await res.json();
         setComments(data); // Kommentare in State setzen
       } catch (err) {
@@ -80,7 +82,7 @@ const RecipeDetail = () => {
     }
 
     try {
-      const res = await fetch(`http://ajubuntu:3000/comments/${id}`, {
+      const res = await fetch(`${API.FAVORITES}/${recipe.id}`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -109,7 +111,7 @@ const RecipeDetail = () => {
     if (!token) return;
 
     try {
-      const res = await fetch(`http://ajubuntu:3000/favorites/${recipe.id}`, {
+      const res = await fetch(`${API.FAVORITES}/${recipe.id}`, {
         method: "POST",
         headers: {
           Authorization: `Bearer ${token}`,
@@ -128,7 +130,7 @@ const RecipeDetail = () => {
   // Rezept aus Favoriten entfernen
   const handleUnfavorite = async () => {
     try {
-      const res = await fetch(`http://ajubuntu:3000/favorites/${recipe.id}`, {
+      const res = await fetch(`${API.FAVORITES}/${recipe.id}`, {
         method: "DELETE",
         headers: {
           Authorization: `Bearer ${token}`,
@@ -149,7 +151,7 @@ const RecipeDetail = () => {
     if (!window.confirm("Diesen Kommentar wirklich löschen?")) return;
 
     try {
-      const res = await fetch(`http://ajubuntu:3000/comments/${commentId}`, {
+      const res = await fetch(`${API.COMMENTS}/${commentId}`, {
         method: "DELETE",
         headers: {
           Authorization: `Bearer ${token}`,
@@ -173,7 +175,7 @@ const RecipeDetail = () => {
   // Kommentar aktualisieren
   const handleUpdateComment = async (commentId) => {
     try {
-      const res = await fetch(`http://ajubuntu:3000/comments/${commentId}`, {
+      const res = await fetch(`${API.COMMENTS}/${commentId}`, {
         method: "PATCH",
         headers: {
           "Content-Type": "application/json",
@@ -211,7 +213,7 @@ const RecipeDetail = () => {
       {/* Bild, wenn vorhanden */}
       {recipe.image_path && (
         <img
-          src={`http://ajubuntu:3000/${recipe.image_path}`}
+          src={`${API.UPLOADS}/${recipe.image_path}`}
           alt={recipe.title}
           className="img-fluid my-3"
         />

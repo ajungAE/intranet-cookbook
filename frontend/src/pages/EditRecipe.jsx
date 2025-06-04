@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
+import { API } from "../config";
 
 const EditRecipe = () => {
   const { id } = useParams(); // Holt die ID aus der URL (/edit/:id)
@@ -26,7 +27,7 @@ const EditRecipe = () => {
     const fetchData = async () => {
       try {
         // Holt das aktuelle Rezept
-        const res = await fetch(`http://ajubuntu:3000/recipes/${id}`);
+        const res = await fetch(`${API.RECIPES}/${id}`);
         const data = await res.json();
         if (!res.ok) throw new Error(data.message || "Fehler beim Laden");
 
@@ -39,7 +40,7 @@ const EditRecipe = () => {
         setSelectedCategories(data.categories.map((cat) => cat.id));
 
         // Holt alle verfügbaren Kategorien
-        const catRes = await fetch("http://ajubuntu:3000/categories");
+        const catRes = await fetch(`${API.CATEGORIES}`);
         const cats = await catRes.json();
         setCategories(cats);
       } catch (err) {
@@ -71,7 +72,7 @@ const EditRecipe = () => {
     }
 
     try {
-      const res = await fetch(`http://ajubuntu:3000/recipes/${id}`, {
+      const res = await fetch(`${API.RECIPES}/${id}`, {
         method: "PUT",
         headers: {
           Authorization: `Bearer ${token}`,

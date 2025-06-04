@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import { API } from '../config';
 
 const CreateRecipe = () => {
   // Lokale Zustände für Formularfelder
@@ -28,7 +29,7 @@ const CreateRecipe = () => {
   useEffect(() => {
     const fetchCategories = async () => {
       try {
-        const res = await fetch("http://ajubuntu:3000/categories");
+        const res = await fetch(`${API.CATEGORIES}`);
         const data = await res.json();
         setCategories(data);
       } catch (err) {
@@ -61,7 +62,7 @@ const CreateRecipe = () => {
     }
 
     try {
-      const res = await fetch("http://ajubuntu:3000/recipes", {
+      const res = await fetch(`${API.RECIPES}`, {
         method: "POST",
         headers: {
           Authorization: `Bearer ${token}`,

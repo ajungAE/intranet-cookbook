@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { API } from '../config';
 
 const Login = ({ onLoginSuccess }) => {
   const [email, setEmail] = useState('');
@@ -10,7 +11,7 @@ const Login = ({ onLoginSuccess }) => {
     setError('');
 
     try {
-      const res = await fetch('http://ajubuntu:3000/auth/login', {
+      const res = await fetch(`${API.AUTH}/login`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email, password })

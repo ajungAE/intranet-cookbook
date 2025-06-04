@@ -1,4 +1,6 @@
 import { useEffect, useState } from "react";
+import { API } from "../config";
+
 
 const Favorites = () => {
   const [favorites, setFavorites] = useState([]);
@@ -8,7 +10,7 @@ const Favorites = () => {
   useEffect(() => {
     const fetchFavorites = async () => {
       try {
-        const res = await fetch("http://ajubuntu:3000/favorites/me", {
+        const res = await fetch(`${API.FAVORITES}/me`, {
           headers: {
             Authorization: `Bearer ${token}`,
           },
@@ -27,7 +29,7 @@ const Favorites = () => {
 
   const handleRemoveFavorite = async (recipeId) => {
     try {
-      const res = await fetch(`http://ajubuntu:3000/favorites/${recipeId}`, {
+      const res = await fetch(`${API.FAVORITES}/${recipeId}`, {
         method: "DELETE",
         headers: {
           Authorization: `Bearer ${token}`,
@@ -57,7 +59,7 @@ const Favorites = () => {
             <div className="card">
               {recipe.image_path && (
                 <img
-                  src={`http://ajubuntu:3000/${recipe.image_path}`}
+                  src={`${API.UPLOADS}/${recipe.image_path}`}
                   className="card-img-top"
                   alt={recipe.title}
                 />

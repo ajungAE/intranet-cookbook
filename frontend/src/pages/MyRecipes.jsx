@@ -1,5 +1,7 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { API } from "../config";
+
 
 const MyRecipes = () => {
   const [recipes, setRecipes] = useState([]);
@@ -10,7 +12,7 @@ const MyRecipes = () => {
   useEffect(() => {
     const fetchMyRecipes = async () => {
       try {
-        const res = await fetch("http://ajubuntu:3000/recipes/me", {
+        const res = await fetch(`${API.RECIPES}/me`, {
           headers: {
             Authorization: `Bearer ${token}`,
           },
@@ -38,7 +40,7 @@ const MyRecipes = () => {
     if (!window.confirm("Willst du dieses Rezept wirklich löschen?")) return;
 
     try {
-      const res = await fetch(`http://ajubuntu:3000/recipes/${id}`, {
+      const res = await fetch(`${API.RECIPES}/${id}`, {
         method: "DELETE",
         headers: {
           Authorization: `Bearer ${token}`,
@@ -65,7 +67,7 @@ const MyRecipes = () => {
             <div className="card h-100 d-flex flex-column">
               {recipe.image_path && (
                 <img
-                  src={`http://ajubuntu:3000/${recipe.image_path}`}
+                  src={`${API.UPLOADS}/${recipe.image_path}`}
                   className="card-img-top"
                   alt={recipe.title}
                 />

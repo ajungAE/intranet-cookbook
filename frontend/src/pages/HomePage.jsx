@@ -1,5 +1,7 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
+import { API } from "../config";
+
 
 const HomePage = () => {
   const [recipes, setRecipes] = useState([]);
@@ -8,7 +10,7 @@ const HomePage = () => {
   useEffect(() => {
     const fetchRecipes = async () => {
       try {
-        const res = await fetch("http://ajubuntu:3000/recipes");
+        const res = await fetch(`${API.RECIPES}`);
         const data = await res.json();
 
         if (!res.ok) throw new Error(data.message || "Fehler beim Laden");
@@ -31,7 +33,7 @@ const HomePage = () => {
             <div className="card h-100 position-relative">
               {recipe.image_path && (
                 <img
-                  src={`http://ajubuntu:3000/${recipe.image_path}`}
+                  src={`${API.UPLOADS}/${recipe.image_path}`}
                   className="card-img-top"
                   alt={recipe.title}
                 />
