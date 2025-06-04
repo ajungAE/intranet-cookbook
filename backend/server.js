@@ -1,4 +1,6 @@
 // 1. Core imports
+import https from 'https';
+import fs from 'fs';
 import express from 'express';
 import cors from 'cors';
 import dotenv from 'dotenv';
@@ -41,7 +43,13 @@ db.getConnection()
     console.error('DB connection failed:', err);
   });
 
-// 8. Server listen
-app.listen(PORT, () => {
-  console.log(`Server running on http://localhost:${PORT}`);
+// Zertifikat laden
+const sslOptions = {
+  key: fs.readFileSync('./ssl/key.pem'),
+  cert: fs.readFileSync('./ssl/cert.pem'),
+};
+
+// HTTPS-Server starten
+https.createServer(sslOptions, app).listen(PORT, () => {
+  console.log(`HTTPS-Server läuft unter https://localhost:${PORT}`);
 });
