@@ -1,5 +1,6 @@
 import { useParams } from "react-router-dom";
 import { useEffect, useState } from "react";
+import { jwtDecode } from "jwt-decode";
 
 const RecipeDetail = () => {
   // ID aus der URL extrahieren (/recipes/:id)
@@ -13,9 +14,14 @@ const RecipeDetail = () => {
   const [submitError, setSubmitError] = useState("");
   const [submitSuccess, setSubmitSuccess] = useState("");
   const [isFavorite, setIsFavorite] = useState(false);
+  const [editCommentId, setEditCommentId] = useState(null);
+  const [editCommentText, setEditCommentText] = useState("");
 
-  // 🧪 Token aus localStorage holen (wenn vorhanden)
+  // Token aus localStorage holen (wenn vorhanden)
   const token = localStorage.getItem("token");
+
+  // User-ID aus dem JWT-Token extrahieren
+  const userId = token ? jwtDecode(token).id : null;
 
   // ================================
   // REZEPT LADEN beim ersten Render
@@ -90,9 +96,9 @@ const RecipeDetail = () => {
       }
 
       // Kommentar erfolgreich → leeren + neu laden
-      setNewComment("");
+      setNewComment(""); // Formular leeren
       setSubmitSuccess("Kommentar wurde gespeichert.");
-      setComments((prev) => [...prev, data]); // Optional sofort anzeigen
+      await fetchComments(); // Kommentare vollständig neu laden
     } catch (err) {
       setSubmitError(err.message);
     }
@@ -137,6 +143,62 @@ const RecipeDetail = () => {
       console.error("Fehler beim Entfernen des Favoriten:", err.message);
     }
   };
+
+  // Kommentar löschen
+  const handleDeleteComment = async (commentId) => {
+    if (!window.confirm("Diesen Kommentar wirklich löschen?")) return;
+
+    try {
+      const res = await fetch(`http://ajubuntu:3000/comments/${commentId}`, {
+        method: "DELETE",
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      if (!res.ok) throw new Error("Fehler beim Löschen");
+
+      setComments((prev) => prev.filter((c) => c.id !== commentId));
+    } catch (err) {
+      console.error("Fehler beim Löschen:", err.message);
+    }
+  };
+
+  // Kommentar bearbeiten vorbereiten
+  const handleEditClick = (comment) => {
+    setEditCommentId(comment.id);
+    setEditCommentText(comment.text);
+  };
+
+  // Kommentar aktualisieren
+  const handleUpdateComment = async (commentId) => {
+    try {
+      const res = await fetch(`http://ajubuntu:3000/comments/${commentId}`, {
+        method: "PATCH",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({ text: editCommentText }),
+      });
+
+      if (!res.ok) throw new Error("Fehler beim Aktualisieren");
+
+      setComments((prev) =>
+        prev.map((c) =>
+          c.id === commentId ? { ...c, text: editCommentText } : c
+        )
+      );
+      setEditCommentId(null);
+      setEditCommentText("");
+    } catch (err) {
+      console.error("Fehler beim Bearbeiten:", err.message);
+    }
+  };
+
+  if (error) return <div className="container mt-5 text-danger">{error}</div>;
+  if (!recipe) return <div className="container mt-5">Lade Rezept...</div>;
+
 
   // ===============================
   // Hauptinhalt der Detailseite
@@ -201,11 +263,53 @@ const RecipeDetail = () => {
       <ul className="list-group mb-4">
         {comments.map((c) => (
           <li key={c.id} className="list-group-item">
-            <strong>{c.username}:</strong> {c.text}
-            <br />
-            <small className="text-muted">
-              {new Date(c.created_at).toLocaleString()}
-            </small>
+            <strong>{c.username}:</strong>{" "}
+            {editCommentId === c.id ? (
+              <>
+                <textarea
+                  className="form-control my-2"
+                  rows="2"
+                  value={editCommentText}
+                  onChange={(e) => setEditCommentText(e.target.value)}
+                />
+                <button
+                  className="btn btn-sm btn-success me-2"
+                  onClick={() => handleUpdateComment(c.id)}
+                >
+                  Speichern
+                </button>
+                <button
+                  className="btn btn-sm btn-secondary"
+                  onClick={() => setEditCommentId(null)}
+                >
+                  Abbrechen
+                </button>
+              </>
+            ) : (
+              <>
+                {c.text}
+                <br />
+                <small className="text-muted">
+                  {new Date(c.created_at).toLocaleString()}
+                </small>
+                {userId === c.user_id && (
+                  <div className="mt-2">
+                    <button
+                      className="btn btn-sm btn-outline-primary me-2"
+                      onClick={() => handleEditClick(c)}
+                    >
+                      Bearbeiten
+                    </button>
+                    <button
+                      className="btn btn-sm btn-outline-danger"
+                      onClick={() => handleDeleteComment(c.id)}
+                    >
+                      Löschen
+                    </button>
+                  </div>
+                )}
+              </>
+            )}
           </li>
         ))}
       </ul>
