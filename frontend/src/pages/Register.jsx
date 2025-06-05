@@ -24,6 +24,15 @@ const Register = () => {
       return setError("Bitte fülle alle Felder aus.");
     }
 
+    // Passwort muss mindestens 8 Zeichen lang sein und mindestens ein Sonderzeichen oder eine Zahl enthalten
+    const passwordRegex = /^(?=.*[!@#$%^&*()_+\-=[\]{};':"\\|,.<>/?0-9]).{8,}$/;
+
+    if (!passwordRegex.test(password)) {
+      return setError(
+        "Passwort muss mindestens 8 Zeichen und ein Sonderzeichen/Zahl enthalten."
+      );
+    }
+
     try {
       const res = await fetch(`${API.AUTH}/register`, {
         method: "POST",
@@ -39,7 +48,7 @@ const Register = () => {
 
       setSuccess("Registrierung erfolgreich. Du wirst weitergeleitet …");
 
-      // Automatisch zur Login-Seite weiterleiten
+      /// Nach kurzer Verzögerung zur Login-Seite navigieren, um Erfolgsnachricht anzuzeigen
       setTimeout(() => navigate("/login"), 1500);
     } catch (err) {
       setError(err.message);
