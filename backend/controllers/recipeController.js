@@ -2,7 +2,7 @@ import db from "../config/db.js";
 
 // POST /recipes
 export const createRecipe = async (req, res) => {
-  const imagePath = req.file ? req.file.path : null;
+  const imagePath = req.file ? req.file.filename : null;
   const { title, ingredients, instructions } = req.body;
 
   if (!title || !ingredients || !instructions) {
@@ -159,7 +159,7 @@ export const updateRecipe = async (req, res) => {
   const userId = req.user.id;
   const { title, ingredients, instructions } = req.body;
   const categoryIds = JSON.parse(req.body.categoryIds || '[]');
-  const imagePath = req.file ? req.file.path : null;
+  const imagePath = req.file ? req.file.filename : null;
 
   try {
     const conn = await db.getConnection();
