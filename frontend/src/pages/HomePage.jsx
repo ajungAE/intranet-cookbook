@@ -7,16 +7,22 @@ const HomePage = () => {
   const [error, setError] = useState("");
   const [categories, setCategories] = useState([]);
   const [selectedCategories, setSelectedCategories] = useState([]);
-
+  const [searchText, setSearchText] = useState("");
 
   useEffect(() => {
     const fetchRecipes = async () => {
       try {
-        const query =
-          selectedCategories.length > 0
-            ? `?categories=${selectedCategories.join(",")}`
-            : "";
-        const res = await fetch(`${API.RECIPES}${query}`);
+        const queryParams = new URLSearchParams();
+
+        if (selectedCategories.length > 0) {
+          queryParams.set("categories", selectedCategories.join(","));
+        }
+
+        if (searchText.trim()) {
+          queryParams.set("search", searchText.trim());
+        }
+
+        const res = await fetch(`${API.RECIPES}?${queryParams.toString()}`);
         const data = await res.json();
         if (!res.ok) throw new Error(data.message || "Fehler beim Laden");
         setRecipes(data);
@@ -26,7 +32,7 @@ const HomePage = () => {
     };
 
     fetchRecipes();
-  }, [selectedCategories]);
+  }, [selectedCategories, searchText]);
 
   useEffect(() => {
     const fetchCategories = async () => {
@@ -46,6 +52,21 @@ const HomePage = () => {
     <div className="container mt-5">
       <h1 className="mb-4">Alle Rezepte</h1>
       {error && <div className="alert alert-danger">{error}</div>}
+
+      <div className="mb-4">
+        <label htmlFor="search" className="form-label">
+          Titel durchsuchen:
+        </label>
+        <input
+          type="text"
+          className="form-control"
+          id="search"
+          placeholder="z. B. Pasta, Salat..."
+          value={searchText}
+          onChange={(e) => setSearchText(e.target.value)}
+        />
+      </div>
+
       <div className="mb-4">
         <h5>Filter nach Kategorien:</h5>
         <div className="d-flex flex-wrap gap-3">
