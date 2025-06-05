@@ -31,22 +31,39 @@ export const createRecipe = async (req, res) => {
 
 // GET /recipes
 export const getAllRecipes = async (req, res) => {
+  const { categories } = req.query;
+
   try {
     const conn = await db.getConnection();
 
-    const recipes = await conn.query(
-      `SELECT r.*, 
-              GROUP_CONCAT(c.name) AS categories
-       FROM recipe r
-       LEFT JOIN recipe_category rc ON r.id = rc.recipe_id
-       LEFT JOIN category c ON rc.category_id = c.id
-       GROUP BY r.id
-       ORDER BY r.created_at DESC`
-    );
+    let recipes;
+    if (categories) {
+      const categoryIds = categories.split(',').map(id => parseInt(id));
+      const placeholders = categoryIds.map(() => '?').join(',');
+
+      recipes = await conn.query(
+        `SELECT DISTINCT r.*, GROUP_CONCAT(c.name) AS categories
+         FROM recipe r
+         JOIN recipe_category rc ON r.id = rc.recipe_id
+         JOIN category c ON rc.category_id = c.id
+         WHERE c.id IN (${placeholders})
+         GROUP BY r.id
+         ORDER BY r.created_at DESC`,
+        categoryIds
+      );
+    } else {
+      recipes = await conn.query(
+        `SELECT r.*, GROUP_CONCAT(c.name) AS categories
+         FROM recipe r
+         LEFT JOIN recipe_category rc ON r.id = rc.recipe_id
+         LEFT JOIN category c ON rc.category_id = c.id
+         GROUP BY r.id
+         ORDER BY r.created_at DESC`
+      );
+    }
 
     conn.end();
 
-    // Optional: Kategorien in Array umwandeln
     const formatted = recipes.map(r => ({
       ...r,
       categories: r.categories ? r.categories.split(',') : []
@@ -58,6 +75,7 @@ export const getAllRecipes = async (req, res) => {
     res.status(500).json({ message: 'Failed to fetch recipes', error: err.message });
   }
 };
+
 
 
 // GET /recipes/me
