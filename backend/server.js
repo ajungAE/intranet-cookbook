@@ -60,7 +60,17 @@ const sslOptions = {
   cert: fs.readFileSync('./ssl/cert.pem'),
 };
 
-// HTTPS-Server starten
-https.createServer(sslOptions, app).listen(PORT, () => {
-  console.log(`HTTPS-Server läuft unter https://${HOSTNAME}:${PORT}`);
-});
+// Nur starten, wenn nicht im Test-Modus
+if (process.env.NODE_ENV !== 'test') {
+  const httpsServer = https.createServer(sslOptions, app);
+  httpsServer.listen(PORT, () => {
+    console.log(`HTTPS-Server läuft unter https://${HOSTNAME}:${PORT}`);
+    db.getConnection().then(conn => {
+      console.log('Connected to MariaDB');
+      conn.end();
+    }).catch(err => console.error('DB connection failed:', err));
+  });
+}
+
+// Export für Tests
+export { app };
