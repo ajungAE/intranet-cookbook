@@ -31,52 +31,54 @@ export const createRecipe = async (req, res) => {
 
 // GET /recipes
 export const getAllRecipes = async (req, res) => {
-  const { categories } = req.query;
+  const { categories = "", search = "" } = req.query;
 
   try {
     const conn = await db.getConnection();
+    const params = [];
+    const whereClauses = [];
 
-    let recipes;
     if (categories) {
-      const categoryIds = categories.split(',').map(id => parseInt(id));
-      const placeholders = categoryIds.map(() => '?').join(',');
-
-      recipes = await conn.query(
-        `SELECT DISTINCT r.*, GROUP_CONCAT(c.name) AS categories
-         FROM recipe r
-         JOIN recipe_category rc ON r.id = rc.recipe_id
-         JOIN category c ON rc.category_id = c.id
-         WHERE c.id IN (${placeholders})
-         GROUP BY r.id
-         ORDER BY r.created_at DESC`,
-        categoryIds
-      );
-    } else {
-      recipes = await conn.query(
-        `SELECT r.*, GROUP_CONCAT(c.name) AS categories
-         FROM recipe r
-         LEFT JOIN recipe_category rc ON r.id = rc.recipe_id
-         LEFT JOIN category c ON rc.category_id = c.id
-         GROUP BY r.id
-         ORDER BY r.created_at DESC`
-      );
+      const categoryIds = categories.split(",").map((id) => parseInt(id));
+      const placeholders = categoryIds.map(() => "?").join(",");
+      whereClauses.push(`c.id IN (${placeholders})`);
+      params.push(...categoryIds);
     }
+
+    if (search.trim()) {
+      whereClauses.push(`r.title LIKE ?`);
+      params.push(`%${search.trim()}%`);
+    }
+
+    const whereSQL =
+      whereClauses.length > 0 ? `WHERE ${whereClauses.join(" AND ")}` : "";
+
+    const recipes = await conn.query(
+      `SELECT DISTINCT r.*, GROUP_CONCAT(c.name) AS categories
+     FROM recipe r
+     LEFT JOIN recipe_category rc ON r.id = rc.recipe_id
+     LEFT JOIN category c ON rc.category_id = c.id
+     ${whereSQL}
+     GROUP BY r.id
+     ORDER BY r.created_at DESC`,
+      params
+    );
 
     conn.end();
 
-    const formatted = recipes.map(r => ({
+    const formatted = recipes.map((r) => ({
       ...r,
-      categories: r.categories ? r.categories.split(',') : []
+      categories: r.categories ? r.categories.split(",") : [],
     }));
 
     res.status(200).json(formatted);
   } catch (err) {
     console.error(err);
-    res.status(500).json({ message: 'Failed to fetch recipes', error: err.message });
+    res
+      .status(500)
+      .json({ message: "Failed to fetch recipes", error: err.message });
   }
 };
-
-
 
 // GET /recipes/me
 export const getMyRecipes = async (req, res) => {
@@ -102,37 +104,38 @@ export const getRecipeById = async (req, res) => {
   try {
     const conn = await db.getConnection();
 
-    const recipeResult = await conn.query(
-      `SELECT * FROM recipe WHERE id = ?`, [recipeId]
-    );
+    const recipeResult = await conn.query(`SELECT * FROM recipe WHERE id = ?`, [
+      recipeId,
+    ]);
 
     if (recipeResult.length === 0) {
       conn.end();
-      return res.status(404).json({ message: 'Recipe not found' });
+      return res.status(404).json({ message: "Recipe not found" });
     }
 
     const catResult = await conn.query(
       `SELECT c.name 
        FROM category c 
        JOIN recipe_category rc ON c.id = rc.category_id
-       WHERE rc.recipe_id = ?`, [recipeId]
+       WHERE rc.recipe_id = ?`,
+      [recipeId]
     );
 
     conn.end();
 
     const recipe = {
       ...recipeResult[0],
-      categories: catResult.map(c => c.name)
+      categories: catResult.map((c) => c.name),
     };
 
     res.status(200).json(recipe);
   } catch (err) {
     console.error(err);
-    res.status(500).json({ message: 'Failed to fetch recipe', error: err.message });
+    res
+      .status(500)
+      .json({ message: "Failed to fetch recipe", error: err.message });
   }
 };
-
-
 
 // DELETE /recipes/:id
 export const deleteRecipe = async (req, res) => {
@@ -176,18 +179,20 @@ export const updateRecipe = async (req, res) => {
   const recipeId = req.params.id;
   const userId = req.user.id;
   const { title, ingredients, instructions } = req.body;
-  const categoryIds = JSON.parse(req.body.categoryIds || '[]');
+  const categoryIds = JSON.parse(req.body.categoryIds || "[]");
   const imagePath = req.file ? req.file.filename : null;
 
   try {
     const conn = await db.getConnection();
 
     // Rezept abfragen + Rechte prüfen
-    const [result] = await conn.query("SELECT * FROM recipe WHERE id = ?", [recipeId]);
+    const [result] = await conn.query("SELECT * FROM recipe WHERE id = ?", [
+      recipeId,
+    ]);
     if (!result || result.user_id !== userId) {
       conn.end();
       return res.status(result ? 403 : 404).json({
-        message: result ? "Nicht berechtigt" : "Rezept nicht gefunden"
+        message: result ? "Nicht berechtigt" : "Rezept nicht gefunden",
       });
     }
 
@@ -221,7 +226,9 @@ export const updateRecipe = async (req, res) => {
     }
 
     // Kategorien aktualisieren
-    await conn.query("DELETE FROM recipe_category WHERE recipe_id = ?", [recipeId]);
+    await conn.query("DELETE FROM recipe_category WHERE recipe_id = ?", [
+      recipeId,
+    ]);
     for (const catId of categoryIds) {
       await conn.query(
         "INSERT INTO recipe_category (recipe_id, category_id) VALUES (?, ?)",
@@ -233,7 +240,8 @@ export const updateRecipe = async (req, res) => {
     res.status(200).json({ message: "Rezept erfolgreich aktualisiert" });
   } catch (err) {
     console.error("Fehler beim Aktualisieren:", err);
-    res.status(500).json({ message: "Fehler beim Aktualisieren", error: err.message });
+    res
+      .status(500)
+      .json({ message: "Fehler beim Aktualisieren", error: err.message });
   }
 };
-
