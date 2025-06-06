@@ -1,6 +1,19 @@
+/**
+ * @module controllers/favoriteController
+ * @description Controller-Funktionen für Favoriten-Funktionalität
+ */
 import db from '../config/db.js';
 
-// POST /favorites/:recipeId
+/**
+ * Fügt ein Rezept zu den Favoriten des aktuellen Nutzers hinzu.
+ * 
+ * @route POST /favorites/:recipeId
+ * @async
+ * @function
+ * @param {Request} req - Express-Request (enthält user und recipeId)
+ * @param {Response} res - JSON-Antwort mit Status
+ * @returns {Response} Erfolg oder Fehlermeldung
+ */
 export const addFavorite = async (req, res) => {
   const userId = req.user.id;
   const recipeId = req.params.recipeId;
@@ -21,7 +34,16 @@ export const addFavorite = async (req, res) => {
   }
 };
 
-// DELETE /favorites/:recipeId
+/**
+ * Entfernt ein Rezept aus den Favoriten des aktuellen Nutzers.
+ * 
+ * @route DELETE /favorites/:recipeId
+ * @async
+ * @function
+ * @param {Request} req - Express-Request (enthält user und recipeId)
+ * @param {Response} res - JSON-Antwort mit Status
+ * @returns {Response} Erfolg oder Fehlermeldung
+ */
 export const removeFavorite = async (req, res) => {
   const userId = req.user.id;
   const recipeId = req.params.recipeId;
@@ -39,7 +61,17 @@ export const removeFavorite = async (req, res) => {
   }
 };
 
-// GET /favorites/me
+
+/**
+ * Gibt alle Lieblingsrezepte des eingeloggten Nutzers zurück.
+ * 
+ * @route GET /favorites/me
+ * @async
+ * @function
+ * @param {Request} req - Express-Request mit Nutzerinformation
+ * @param {Response} res - JSON-Array der Favoriten
+ * @returns {Response} Liste von Rezepten
+ */
 export const getFavoritesForUser = async (req, res) => {
   const userId = req.user.id;
 

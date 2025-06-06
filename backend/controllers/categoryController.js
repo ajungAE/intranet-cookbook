@@ -1,6 +1,18 @@
+/**
+ * @module controllers/categoryController
+ * @description Behandelt Kategorien und deren Zuweisung zu Rezepten
+ */
 import db from '../config/db.js';
 
-// GET /categories
+/**
+ * Gibt alle verfügbaren Kategorien zurück.
+ * 
+ * @route GET /categories
+ * @async
+ * @function
+ * @param {Request} req - HTTP-Request
+ * @param {Response} res - JSON-Antwort mit Kategorie-Liste
+ */
 export const getAllCategories = async (req, res) => {
   try {
     const conn = await db.getConnection();
@@ -12,7 +24,15 @@ export const getAllCategories = async (req, res) => {
   }
 };
 
-// POST /categories
+/**
+ * Erstellt eine neue Kategorie.
+ * 
+ * @route POST /categories
+ * @async
+ * @function
+ * @param {Request} req - Express-Request (enthält Feld `name`)
+ * @param {Response} res - Erfolgs- oder Fehlermeldung
+ */
 export const createCategory = async (req, res) => {
   const { name } = req.body;
 
@@ -31,7 +51,15 @@ export const createCategory = async (req, res) => {
   }
 };
 
-// POST /categories/assign/:recipeId
+/**
+ * Ordnet einem Rezept eine bestehende Kategorie zu.
+ * 
+ * @route POST /categories/assign/:recipeId
+ * @async
+ * @function
+ * @param {Request} req - Express-Request (enthält Param `recipeId`, Body `categoryId`)
+ * @param {Response} res - Erfolgs- oder Fehlermeldung
+ */
 export const assignCategoryToRecipe = async (req, res) => {
   const { categoryId } = req.body;
   const recipeId = req.params.recipeId;

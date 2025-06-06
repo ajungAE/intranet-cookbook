@@ -1,6 +1,19 @@
+/**
+ * @module controllers/commentController
+ * @description Controller für das Kommentarsystem (CRUD für Kommentare)
+ */
 import db from '../config/db.js';
 
-// POST /comments/:recipeId
+/**
+ * Fügt einen neuen Kommentar zu einem Rezept hinzu.
+ * 
+ * @route POST /comments/:recipeId
+ * @async
+ * @function
+ * @param {Request} req - Enthält Kommentartext und Nutzerinfo
+ * @param {Response} res - Gibt erstellten Kommentar mit Usernamen zurück
+ * @returns {Response} JSON mit Kommentar oder Fehlermeldung
+ */
 export const addComment = async (req, res) => {
   const { text } = req.body;
   const userId = req.user.id;
@@ -39,7 +52,16 @@ export const addComment = async (req, res) => {
 };
 
 
-// GET /comments/:recipeId
+/**
+ * Gibt alle Kommentare zu einem bestimmten Rezept zurück.
+ * 
+ * @route GET /comments/:recipeId
+ * @async
+ * @function
+ * @param {Request} req - Enthält Rezept-ID
+ * @param {Response} res - Liste von Kommentaren
+ * @returns {Response} JSON-Array mit Kommentaren
+ */
 export const getCommentsByRecipe = async (req, res) => {
   const recipeId = req.params.recipeId;
 
@@ -61,7 +83,16 @@ export const getCommentsByRecipe = async (req, res) => {
 };
 
 
-// DELETE /comments/:commentId
+/**
+ * Löscht einen Kommentar (nur durch Ersteller möglich).
+ * 
+ * @route DELETE /comments/:commentId
+ * @async
+ * @function
+ * @param {Request} req - Enthält Kommentar-ID und Nutzerinfo
+ * @param {Response} res - Erfolgs- oder Fehlermeldung
+ * @returns {Response}
+ */
 export const deleteComment = async (req, res) => {
   const commentId = req.params.commentId;
   const userId = req.user.id;
@@ -86,7 +117,16 @@ export const deleteComment = async (req, res) => {
   }
 };
 
-// PATCH /comments/:commentId
+/**
+ * Bearbeitet einen bestehenden Kommentar (nur durch Ersteller möglich).
+ * 
+ * @route PATCH /comments/:commentId
+ * @async
+ * @function
+ * @param {Request} req - Enthält neuen Kommentartext
+ * @param {Response} res - Erfolgs- oder Fehlermeldung
+ * @returns {Response}
+ */
 export const updateComment = async (req, res) => {
   const { commentId } = req.params;
   const { text } = req.body;

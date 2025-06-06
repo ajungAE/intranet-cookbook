@@ -1,8 +1,19 @@
+/**
+ * Authentifizierungscontroller für Registrierung und Login
+ * @module controllers/authController
+ */
 import bcrypt from "bcryptjs";
 import db from "../config/db.js";
 import jwt from 'jsonwebtoken';
 
-// POST /auth/register 
+/**
+ * Registriert einen neuen Benutzer.
+ * 
+ * @route POST /auth/register
+ * @param {Request} req - Express-Request-Objekt
+ * @param {Response} res - Express-Response-Objekt
+ * @returns {Response} Erfolgs- oder Fehlermeldung
+ */
 export const registerUser = async (req, res) => {
   const { email, password, username } = req.body;
 
@@ -37,7 +48,14 @@ export const registerUser = async (req, res) => {
   }
 };
 
-// POST /auth/login
+/**
+ * Loggt einen Benutzer ein.
+ * 
+ * @route POST /auth/login
+ * @param {Request} req - Express-Request-Objekt
+ * @param {Response} res - Express-Response-Objekt
+ * @returns {Response} JWT-Token bei Erfolg oder Fehlermeldung
+ */
 export const loginUser = async (req, res) => {
   const { email, password } = req.body;
 

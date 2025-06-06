@@ -1,6 +1,19 @@
+/**
+ * @module controllers/recipeController
+ * @description Controller-Funktionen für Rezepte (CRUD + optional: Favoriten, Kommentare)
+ */
 import db from "../config/db.js";
 
-// POST /recipes
+/**
+ * Erstellt ein neues Rezept.
+ * 
+ * @route POST /recipes
+ * @async
+ * @function
+ * @param {Request} req
+ * @param {Response} res
+ * @returns {Response} Erfolgs- oder Fehlermeldung
+ */
 export const createRecipe = async (req, res) => {
   const imagePath = req.file ? req.file.filename : null;
   const { title, ingredients, instructions } = req.body;
@@ -29,7 +42,16 @@ export const createRecipe = async (req, res) => {
   }
 };
 
-// GET /recipes
+/**
+ * Holt alle veröffentlichten Rezepte.
+ * 
+ * @route GET /recipes
+ * @async
+ * @function
+ * @param {Request} req - Express-Request-Objekt
+ * @param {Response} res - Express-Response-Objekt
+ * @returns {Response} JSON-Array mit Rezepten
+ */
 export const getAllRecipes = async (req, res) => {
   const { categories = "", search = "" } = req.query;
 
@@ -80,10 +102,19 @@ export const getAllRecipes = async (req, res) => {
   }
 };
 
-// GET /recipes/me
+/**
+ * Holt alle Rezepte des aktuell eingeloggten Benutzers.
+ * 
+ * @route GET /recipes/me
+ * @async
+ * @function
+ * @param {Request} req - Express-Request mit Benutzerinfo (JWT)
+ * @param {Response} res - Express-Response mit Liste der eigenen Rezepte
+ * @returns {Response} JSON-Array mit Rezepten des eingeloggten Nutzers
+ */
 export const getMyRecipes = async (req, res) => {
   try {
-    console.log("👤 req.user:", req.user); // Debug
+    console.log("req.user:", req.user); // Debug
     const conn = await db.getConnection();
     const rows = await conn.query("SELECT * FROM recipe WHERE user_id = ?", [
       req.user.id,
@@ -97,7 +128,16 @@ export const getMyRecipes = async (req, res) => {
   }
 };
 
-// GET /recipes/:id
+/**
+ * Holt ein einzelnes Rezept nach ID.
+ * 
+ * @route GET /recipes/:id
+ * @async
+ * @function
+ * @param {Request} req
+ * @param {Response} res
+ * @returns {Response} Rezept-Objekt oder Fehlermeldung
+ */
 export const getRecipeById = async (req, res) => {
   const recipeId = req.params.id;
 
@@ -137,7 +177,16 @@ export const getRecipeById = async (req, res) => {
   }
 };
 
-// DELETE /recipes/:id
+/**
+ * Löscht ein Rezept anhand der ID.
+ * 
+ * @route DELETE /recipes/:id
+ * @async
+ * @function
+ * @param {Request} req
+ * @param {Response} res
+ * @returns {Response} Erfolgs- oder Fehlermeldung
+ */
 export const deleteRecipe = async (req, res) => {
   const recipeId = req.params.id;
   const userId = req.user.id;
@@ -174,7 +223,16 @@ export const deleteRecipe = async (req, res) => {
   }
 };
 
-// PUT /recipes/:id
+/**
+ * Aktualisiert ein bestehendes Rezept.
+ * 
+ * @route PUT /recipes/:id
+ * @async
+ * @function
+ * @param {Request} req
+ * @param {Response} res
+ * @returns {Response} Erfolgs- oder Fehlermeldung
+ */
 export const updateRecipe = async (req, res) => {
   const recipeId = req.params.id;
   const userId = req.user.id;
