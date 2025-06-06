@@ -1,4 +1,4 @@
-# Intranet-Kochbuch API (Projekt FPAdW - Alexander Jung)
+# Intranet-Kochbuch API (Projekt FPAdW - Alex Jung)
 
 ## 📚 Projektübersicht
 
@@ -29,6 +29,18 @@ Abgeschlossen (Stand: Juni 2025)
 
   ```bash
   npm test -- --coverage
+  ```
+
+  Die Coverage-Berichte (inkl. HTML) befinden sich im Verzeichnis:
+
+  ```
+  /backend/coverage/lcov-report/
+  ```
+
+  Im Browser öffnen:
+
+  ```bash
+  firefox coverage/lcov-report/index.html
   ```
 
 ## 🔗 API-Übersicht
@@ -158,11 +170,11 @@ curl -X POST http://localhost:3443/recipes \
 
 ---
 
-© 2025 Alexander Jung – Abschlussprojekt DWG FPAdW, Klasse FI37-1 Comhard GmbH
+© 2025 Alex Jung – Abschlussprojekt FPAdW, Klasse FI37
 
 ---
 
-# 📘 Intranet Cookbook API (Project FPAdW - Alexander Jung)
+# 📘️ Intranet Cookbook API (Project FPAdW - Alex Jung)
 
 ## 📚 Project Overview
 
@@ -193,6 +205,18 @@ Completed (as of June 2025)
 
   ```bash
   npm test -- --coverage
+  ```
+
+  HTML reports are generated under:
+
+  ```
+  /backend/coverage/lcov-report/
+  ```
+
+  Open with:
+
+  ```bash
+  firefox coverage/lcov-report/index.html
   ```
 
 ## 🔗 API Overview
@@ -322,4 +346,4 @@ curl -X POST http://localhost:3443/recipes \
 
 ---
 
-© 2025 Alexander Jung – Final project FPAdW, Class FI37-1 Comhard GmbH
+© 2025 Alex Jung – Final project FPAdW, Class FI37
