@@ -33,6 +33,7 @@ describe('POST /auth/login', () => {
     const conn = await db.getConnection();
     await conn.query('DELETE FROM user WHERE email = ?', [testUser.email]);
     conn.end();
+    await db.end();
   });
 
   it('should return a valid token for correct credentials', async () => {

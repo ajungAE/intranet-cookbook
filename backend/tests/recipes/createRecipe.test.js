@@ -2,13 +2,13 @@
 import request from "supertest";
 import { app } from "../../server.js";
 import db from "../../config/db.js";
-import jwt from "jsonwebtoken";
+import bcrypt from "bcryptjs";
 
 let token;
 const testUser = {
   email: "creator@example.com",
   username: "creatoruser",
-  password: "Passwort123!",
+  password: "Sicher123!",
 };
 
 // Login, um Token zu bekommen
@@ -17,6 +17,14 @@ async function loginAndGetToken() {
     email: testUser.email,
     password: testUser.password,
   });
+
+  console.log("Login-Status:", res.statusCode);
+  console.log("Login-Body:", res.body);
+
+  if (!res.body.token) {
+    throw new Error(`Login failed: ${res.statusCode} - ${JSON.stringify(res.body)}`);
+  }
+
   return res.body.token;
 }
 
@@ -24,17 +32,14 @@ beforeAll(async () => {
   const conn = await db.getConnection();
   await conn.query("DELETE FROM user WHERE email = ?", [testUser.email]);
 
+  const hashedPassword = await bcrypt.hash(testUser.password, 10);
   await conn.query(
     "INSERT INTO user (email, username, password) VALUES (?, ?, ?)",
-    [
-      testUser.email,
-      testUser.username,
-      "$2a$10$E0NR7G8g7b/YY5pBa/.NIOviO1dbZcr3m0N0FDRLkA0C/Pf/JyrCq",
-    ]
+    [testUser.email, testUser.username, hashedPassword]
   );
   conn.end();
 
-  token = await loginAndGetToken(); // sichert sauberes await
+  token = await loginAndGetToken();
   console.log("Token:", token);
 });
 
@@ -43,6 +48,9 @@ afterAll(async () => {
   await conn.query("DELETE FROM user WHERE email = ?", [testUser.email]);
   await conn.query("DELETE FROM recipe WHERE title = ?", ["Testrezept"]);
   conn.end();
+
+  // WICHTIG: Pool schließen, um offene TCP-Handles zu vermeiden
+  await db.end();
 });
 
 describe("POST /recipes", () => {
