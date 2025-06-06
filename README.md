@@ -31,6 +31,22 @@ Abgeschlossen (Stand: Juni 2025)
   npm test -- --coverage
   ```
 
+## 🔗 API-Übersicht
+
+| Methode | Endpoint               | Beschreibung                       | Auth nötig |
+| ------- | ---------------------- | ---------------------------------- | ---------- |
+| POST    | /auth/register         | Benutzer registrieren              | ❌          |
+| POST    | /auth/login            | Einloggen und Token erhalten       | ❌          |
+| GET     | /recipes               | Alle Rezepte abrufen               | ❌          |
+| GET     | /recipes/\:id          | Einzelnes Rezept abrufen           | ❌          |
+| POST    | /recipes               | Rezept erstellen                   | ✅          |
+| PUT     | /recipes/\:id          | Rezept bearbeiten                  | ✅          |
+| DELETE  | /recipes/\:id          | Rezept löschen                     | ✅          |
+| POST    | /recipes/\:id/favorite | Rezept als Favorit markieren       | ✅          |
+| DELETE  | /recipes/\:id/favorite | Rezept aus Favoriten entfernen     | ✅          |
+| POST    | /recipes/\:id/comments | Kommentar zum Rezept hinzufügen    | ✅          |
+| GET     | /recipes/\:id/comments | Kommentare zu einem Rezept abrufen | ❌          |
+
 ## 📁 Projektstruktur
 
 ```
@@ -71,6 +87,7 @@ kochbuch-fi37-jung/
    DB_PASSWORD=deinpass
    DB_NAME=fi37_jung_fpadw
    JWT_SECRET=dein-jwt-secret
+   PORT=3443
    ```
 
 4. **Datenbank erstellen:**
@@ -133,6 +150,7 @@ curl -X POST http://localhost:3443/recipes \
 * `.env.test` wird in `.gitignore` ignoriert, um sensible Daten zu schützen
 * Bei Testläufen wird eine eigene Testdatenbank verwendet
 * Es wird empfohlen, `db.end()` nach allen Tests aufzurufen
+* Port ist über `.env` frei konfigurierbar (`PORT=3443`)
 
 ## 📷 Optional: Screenshots / Vorschau
 
@@ -177,6 +195,22 @@ Completed (as of June 2025)
   npm test -- --coverage
   ```
 
+## 🔗 API Overview
+
+| Method | Endpoint               | Description                  | Auth Required |
+| ------ | ---------------------- | ---------------------------- | ------------- |
+| POST   | /auth/register         | Register new user            | ❌             |
+| POST   | /auth/login            | Login and get token          | ❌             |
+| GET    | /recipes               | Fetch all recipes            | ❌             |
+| GET    | /recipes/\:id          | Fetch single recipe by ID    | ❌             |
+| POST   | /recipes               | Create new recipe            | ✅             |
+| PUT    | /recipes/\:id          | Update recipe                | ✅             |
+| DELETE | /recipes/\:id          | Delete recipe                | ✅             |
+| POST   | /recipes/\:id/favorite | Mark recipe as favorite      | ✅             |
+| DELETE | /recipes/\:id/favorite | Remove recipe from favorites | ✅             |
+| POST   | /recipes/\:id/comments | Add comment to recipe        | ✅             |
+| GET    | /recipes/\:id/comments | Get comments for recipe      | ❌             |
+
 ## 📁 Project Structure
 
 ```
@@ -217,6 +251,7 @@ kochbuch-fi37-jung/
    DB_PASSWORD=yourpass
    DB_NAME=fi37_jung_fpadw
    JWT_SECRET=your-jwt-secret
+   PORT=3443
    ```
 
 4. **Create database:**
@@ -279,6 +314,7 @@ curl -X POST http://localhost:3443/recipes \
 * `.env.test` is gitignored to protect sensitive information
 * Tests use a dedicated test database
 * Call `db.end()` after all tests to cleanly close connections
+* The API port is configurable via `.env` (`PORT=3443`)
 
 ## 📷 Optional: Screenshots / Preview
 
@@ -286,4 +322,4 @@ curl -X POST http://localhost:3443/recipes \
 
 ---
 
-© 2025 Alexander Jung – Final project DWG FPAdW, Class FI37-1 Comhard GmbH
+© 2025 Alexander Jung – Final project FPAdW, Class FI37-1 Comhard GmbH
