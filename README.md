@@ -1,4 +1,4 @@
-# Intranet-Kochbuch API (Projekt FPAdW - Alex Jung)
+# Intranet-Kochbuch API (Projekt FPAdW - Alexander Jung)
 
 ## 📚 Projektübersicht
 
@@ -141,3 +141,149 @@ curl -X POST http://localhost:3443/recipes \
 ---
 
 © 2025 Alexander Jung – Abschlussprojekt DWG FPAdW, Klasse FI37-1 Comhard GmbH
+
+---
+
+# 📘 Intranet Cookbook API (Project FPAdW - Alexander Jung)
+
+## 📚 Project Overview
+
+This project is a digital intranet cookbook for the fictional company DWG. It allows registered employees to manage and share their own recipes. A full-featured Node.js backend with a RESTful API was developed, including authentication, user management, and recipe operations.
+
+## 🔧 Tech Stack
+
+* **Backend:** Node.js, Express
+* **Database:** MariaDB
+* **Authentication:** JWT (JSON Web Tokens)
+* **Testing:** Jest, Supertest
+* **Documentation:** Markdown / README
+
+## 🚀 Project Status
+
+Completed (as of June 2025)
+
+## 🧪 Tests
+
+* **Frameworks:** Jest + Supertest
+* **Test Coverage Includes:**
+
+  * User registration & login (`/auth/register`, `/auth/login`)
+  * Creating, reading, updating, and deleting recipes (`/recipes`)
+  * Access control via JWT authentication
+* **Coverage:**
+  All must-have features are tested. Generate test coverage with:
+
+  ```bash
+  npm test -- --coverage
+  ```
+
+## 📁 Project Structure
+
+```
+kochbuch-fi37-jung/
+├── controllers/          # Route logic
+├── middleware/           # JWT middleware
+├── models/               # DB models (optionally used)
+├── routes/               # API routes (auth, recipes)
+├── config/db.js          # DB connection
+├── server.js             # Express app
+├── tests/                # Jest test files
+├── .env / .env.test      # Environment variables
+└── package.json
+```
+
+## 🛠️ Installation & Setup
+
+1. **Clone repository:**
+
+   ```bash
+   git clone <repo-url>
+   cd kochbuch-fi37-jung/backend
+   ```
+
+2. **Install dependencies:**
+
+   ```bash
+   npm install
+   ```
+
+3. **Configure database:**
+
+   ```env
+   # .env or .env.test
+   DB_HOST=localhost
+   DB_PORT=3306
+   DB_USER=youruser
+   DB_PASSWORD=yourpass
+   DB_NAME=fi37_jung_fpadw
+   JWT_SECRET=your-jwt-secret
+   ```
+
+4. **Create database:**
+   Execute the SQL file from `/db/init.sql` (if present).
+
+5. **Start server:**
+
+   ```bash
+   npm start
+   ```
+
+6. **Run tests:**
+
+   ```bash
+   npm test
+   ```
+
+   Optional to detect open handles:
+
+   ```bash
+   npm test -- --detectOpenHandles
+   ```
+
+   Optional with coverage:
+
+   ```bash
+   npm test -- --coverage
+   ```
+
+## 🔐 Example API Usage
+
+### Register
+
+```bash
+curl -X POST http://localhost:3443/auth/register \
+  -H "Content-Type: application/json" \
+  -d '{"email": "test@example.com", "username": "testuser", "password": "Pass123!"}'
+```
+
+### Login (get token)
+
+```bash
+curl -X POST http://localhost:3443/auth/login \
+  -H "Content-Type: application/json" \
+  -d '{"email": "test@example.com", "password": "Pass123!"}'
+```
+
+### Create recipe (with JWT)
+
+```bash
+curl -X POST http://localhost:3443/recipes \
+  -H "Authorization: Bearer <your-token>" \
+  -F "title=My Recipe" \
+  -F "ingredients=Ingredients" \
+  -F "instructions=Instructions"
+```
+
+## 📝 Notes
+
+* `.env.test` is gitignored to protect sensitive information
+* Tests use a dedicated test database
+* Call `db.end()` after all tests to cleanly close connections
+
+## 📷 Optional: Screenshots / Preview
+
+*(To be added for presentation if needed)*
+
+---
+
+© 2025 Alexander Jung – Final project DWG FPAdW, Class FI37-1 Comhard GmbH
