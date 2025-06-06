@@ -11,6 +11,9 @@ backend/.env.test
 backend/uploads
 backend/ssl
 
+# JSDoc output
+backend/docs
+
 # === Logs ===
 logs/
 *.log
