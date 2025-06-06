@@ -168,9 +168,50 @@ curl -X POST http://localhost:3443/recipes \
 
 *(Können bei Präsentation ergänzt werden)*
 
+## 📄 Technische Dokumentation mit JSDoc
+
+Dieses Projekt verwendet [JSDoc](https://jsdoc.app/) zur automatisierten Generierung technischer API-Dokumentation.
+
+### ✍️ Dokumentierte Dateien
+Die folgenden Controller-Dateien wurden mit JSDoc-Kommentaren versehen:
+
+- `authController.js`
+- `recipeController.js`
+- `favoriteController.js`
+- `commentController.js`
+- `categoryController.js`
+
+### 📂 Ausgabeort
+
+Die generierte Dokumentation befindet sich im Verzeichnis:
+
+```
+
+/backend/docs/
+
+````
+
+### 🌐 Öffnen im Browser
+
+```bash
+firefox docs/index.html
+````
+
+Oder alternativ: Öffne die Datei `docs/index.html` per Doppelklick im Dateibrowser.
+
+### 🛠️ Manuell generieren
+
+```bash
+npm run jsdoc
+```
+
+Dies erzeugt die Dokumentation basierend auf den JSDoc-Kommentaren in deinem Quellcode.
+
+```
+
 ---
 
-© 2025 Alex Jung – Abschlussprojekt FPAdW, Klasse FI37
+© 2025 Alexander Jung – Abschlussprojekt DWG FPAdW, Klasse FI37-1 Comhard GmbH
 
 ---
 
@@ -344,6 +385,47 @@ curl -X POST http://localhost:3443/recipes \
 
 *(To be added for presentation if needed)*
 
+## 📄 Technical Documentation with JSDoc
+
+This project uses [JSDoc](https://jsdoc.app/) to automatically generate technical API documentation.
+
+### ✍️ Documented Files
+The following controller files include JSDoc comments:
+
+- `authController.js`
+- `recipeController.js`
+- `favoriteController.js`
+- `commentController.js`
+- `categoryController.js`
+
+### 📂 Output Directory
+
+The generated documentation is located in:
+
+````
+
+/backend/docs/
+
+````
+
+### 🌐 Open in Browser
+
+```bash
+firefox docs/index.html
+````
+
+Or open the file `docs/index.html` by double-clicking it in your file browser.
+
+### 🛠️ Generate Manually
+
+```bash
+npm run jsdoc
+```
+
+This will generate the documentation from the JSDoc comments in your source code.
+
+```
+
 ---
 
-© 2025 Alex Jung – Final project DWG FPAdW, Class FI37
+© 2025 Alexander Jung – Final project DWG FPAdW, Class FI37-1 Comhard GmbH
