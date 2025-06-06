@@ -25,7 +25,7 @@ Abgeschlossen (Stand: Juni 2025)
   * Rezepte erstellen, abrufen, bearbeiten, löschen (`/recipes`)
   * Zugriffsbeschränkungen durch Authentifizierung (JWT)
 * **Testabdeckung:**
-  Die Tests prüfen alle Must-Have-Anforderungen. Eine Coverage-Analyse kann mit folgendem Befehl erzeugt werden:
+  Die Tests decken alle Muss-Anforderungen ab. Die aktuelle Code-Coverage liegt bei etwa **52%**, wobei alle Kernfunktionen getestet sind. Eine Coverage-Analyse kann mit folgendem Befehl erzeugt werden:
 
   ```bash
   npm test -- --coverage
@@ -201,7 +201,7 @@ Completed (as of June 2025)
   * Creating, reading, updating, and deleting recipes (`/recipes`)
   * Access control via JWT authentication
 * **Coverage:**
-  All must-have features are tested. Generate test coverage with:
+  All must-have features are tested. Current overall code coverage is approx. **52%**, with all core functions tested. Generate test coverage with:
 
   ```bash
   npm test -- --coverage
@@ -346,4 +346,4 @@ curl -X POST http://localhost:3443/recipes \
 
 ---
 
-© 2025 Alex Jung – Final project FPAdW, Class FI37
+© 2025 Alex Jung – Final project DWG FPAdW, Class FI37
