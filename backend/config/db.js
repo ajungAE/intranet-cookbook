@@ -12,4 +12,10 @@ const pool = mariadb.createPool({
   connectionLimit: 5
 });
 
-export default pool;
+// So kannst du später `db.getConnection()` und `db.end()` verwenden
+const db = {
+  getConnection: () => pool.getConnection(),
+  end: () => pool.end()
+};
+
+export default db;
